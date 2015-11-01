@@ -8,15 +8,15 @@ module OMERS
   class Reactor
     include EventsEmitter
 
-    attr_accessor :streams
+    attr_accessor :streams, :socket
 
     def initialize
       @streams = []
     end
 
     def listen(host, port)
-      socket = TCPServer.new(host, port)
-      server = OMERS::Server.new(socket)
+      @socket = TCPServer.new(host, port)
+      server = OMERS::Server.new(@socket)
 
       register(server)
 
@@ -45,6 +45,5 @@ module OMERS
       readable.each { |stream| stream.handle_read    }
       writable.each { |stream| stream.handle_write }
     end
-
   end
 end

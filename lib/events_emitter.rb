@@ -13,7 +13,7 @@ module EventsEmitter
 
   # Will call each listener for an event in the order they where added
   def emit(event, *args)
-    raise ArgumentError.new("Attempted to emit undefined event #{event}") if listeners(event).empty?
+     raise ArgumentError.new("Attempted to emit undefined event #{event}") if listeners(event).empty?
 
     listeners(event).each do |blk|
       blk.call(*args)

@@ -3,14 +3,29 @@ require_relative '../lib/http_server'
 require 'minitest/autorun'
 
 class TestHTTPServer < MiniTest::Unit::TestCase
-  def test_simple_http_server_works
-    server = OMERS::HTTPServer.new
+  # start server running in a background thread
+  Thread.new { OMERS::HTTPServer.new.run }
 
-    Thread.new do
-      Thread.abort_on_exception
-      server.run
-    end
+  def setup
+    @response_200 = "HTTP/1.1 200OK\r\n" +
+                    "Content-Type: text/html\r\n" +
+                    "Content-Length: 22\r\n" +
+                    "Connection: close \r\n" +
+                    "\r\n" +
+                    "<h1> Hello World </h1>"
 
-    assert_equal "Hello World", `echo GET /anything HTTP/1.1 | nc localhost 4481`.strip
+    @response_404 = "HTTP/1.1 404 Not Found\r\n" +
+                    "Content-Type: text/plain\r\n" +
+                    "Content-Length: 16\r\n" +
+                    "Connection: close \r\n" +
+                    "\r\n"
+  end
+
+  def test_server_gets_file_correctly
+    assert_equal @response_200, `echo GET /index.html HTTP/1.1 | nc localhost 4481`
+  end
+
+  def test_server_returns_404_on_non_existant_file
+    assert_equal @response_404, `echo GET /non_existant.html HTTP/1.1 | nc localhost 4481`
   end
 end

@@ -3,7 +3,7 @@ require_relative 'events_emitter'
 module OMERS
   class Stream
     include EventsEmitter
-    CHUNK_SIZE = 8 * 1024
+    CHUNK_SIZE = 4 * 1024
 
     attr_reader :io
 
@@ -12,9 +12,9 @@ module OMERS
       @write_buffer = ""
     end
 
-    def handle_read
+    def handle_read(bytes = CHUNK_SIZE)
       begin
-        data = io.read_nonblock(CHUNK_SIZE)
+        data = io.read_nonblock(bytes)
         emit(:data, data)
       rescue IO::WaitReadable
       rescue EOFError, Errno::ECONNRESET

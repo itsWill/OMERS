@@ -42,7 +42,7 @@ module OMERS
     def tick
       readable, writable, _ = IO.select(streams, streams)
 
-      readable.each { |stream| stream.handle_read    }
+      readable.each { |stream| stream.handle_read  }
       writable.each { |stream| stream.handle_write }
     end
   end

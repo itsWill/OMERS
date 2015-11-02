@@ -1,8 +1,43 @@
 require_relative './reactor'
 
+require 'uri'
+
 module OMERS
   class HTTPServer
     include EventsEmitter
+
+    WEB_ROOT = './public'
+
+    CONTENT_TYPE_MAPPING = {
+      'html' => 'text/html',
+      'txt'  => 'text/plain',
+      'png'  => 'image/png',
+      'jpg'  => 'image/jpeg'
+    }
+
+    DEFAULT_CONTENT_TYPE = 'application/octect-stream'
+
+    def content_type(path)
+      ext = File.extname(path).split('.').last
+      CONTENT_TYPE_MAPPING.fetch(ext, DEFAULT_CONTENT_TYPE)
+    end
+
+    def requested_file(request_line)
+      request_uri = request_line.split(" ")[1]
+      path        = URI.unescape(URI(request_uri).path)
+
+      clean = []
+
+      parts = path.split("/")
+
+      parts.each do |part|
+        next if part.empty? || part == '.'
+
+        part == '..' ? clean.pop : clean << part
+      end
+
+      File.join(WEB_ROOT, *clean)
+    end
 
     attr_reader :listener, :reactor
 
@@ -14,8 +49,36 @@ module OMERS
     def setup
       listener.on(:accept) do |client|
         client.on(:data) do |data|
-          client.write "Hello World"
-          client.close
+
+          path = requested_file(data)
+
+          if File.exist?(path) && !File.directory?(path)
+            File.open(path, "rb") do |file|
+              client.write "HTTP/1.1 200OK\r\n" +
+                           "Content-Type: #{content_type(file)}\r\n" +
+                           "Content-Length: #{file.size}\r\n" +
+                           "Connection: close \r\n"
+
+              client.write "\r\n"
+
+              begin
+                contents = file.read_nonblock(file.size)
+              rescue IO::WaitReadable, EOFError
+              end
+
+              client.write(contents)
+
+            end
+          else
+            message = "File not found \n"
+
+            client.write "HTTP/1.1 404 Not Found\r\n" +
+                         "Content-Type: text/plain\r\n" +
+                         "Content-Length: 16\r\n" +
+                         "Connection: close \r\n"
+            client.write "\r\n"
+          end
+         client.close
         end
       end
     end

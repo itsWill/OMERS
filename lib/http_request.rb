@@ -1,6 +1,7 @@
 #TODO implement HTTP Error codes
 
 require_relative './stream'
+require_relative './http_status'
 
 require 'timeout'
 
@@ -25,17 +26,17 @@ module OMERS
      @request_line = stream.handle_read(MAX_URI_LENGTH)
 
      if @request_line.bytesize >= MAX_URI_LENGTH
-      raise StandardError #HTTP MAX URI ERROR
+      raise HTTPStatus::RequestURITooLarge
      end
 
-     raise "EOF Error" unless @request_line
+     raise HTTPStatus::EOFError unless @request_line
 
      if /^(\S+)\s+(\S+)(?:\s+HTTP\/(\d+\.\d+))?\r?\n/ =~ @request_line
       request[:method] = $1
       request[:uri] = normalize_path($2) unless $2.nil?
       request[:http_version] = $3
      else
-      raise "Bad Request"
+      raise HTTPStatus::BadRequest
      end
     end
 

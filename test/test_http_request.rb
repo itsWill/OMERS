@@ -1,8 +1,9 @@
 require_relative '../lib/http_request'
-require 'minitest/autorun'
-require 'byebug'
+require_relative '../lib/http_status'
 
-class TetsHTTPRequest < MiniTest::Unit::TestCase
+require 'minitest/autorun'
+
+class TestHTTPRequest < MiniTest::Unit::TestCase
 
   # Mock stream object
   class Stream
@@ -30,21 +31,21 @@ class TetsHTTPRequest < MiniTest::Unit::TestCase
   def test_request_larger_than_MAX_URI_LENGTH_raises_exception
     large_request = "a" * OMERS::HTTPRequest::MAX_URI_LENGTH
 
-    assert_raises do
+    assert_raises(OMERS::HTTPStatus::RequestURITooLarge) do
       @http_request.read_request_line( Stream.new(large_request) )
     end
   end
 
   def test_invalid_request_raises_exception
     bad_request = "GET / HTTP/bad.version\r\n"
-    assert_raises do
-      @http_request.read_request_line( Strem.new(bad_request) )
+    assert_raises(OMERS::HTTPStatus::BadRequest) do
+      @http_request.read_request_line( Stream.new(bad_request) )
     end
   end
 
   def test_uri_path_is_sanitized_on_request
     unsafe_uri = "GET /../../../../../../../../etc/passwd HTTP/1.1\r\n"
-    assert_raises do
+    assert_raises(OMERS::HTTPStatus::BadRequest) do
       @http_request.read_request_line( Stream.new(unsafe_uri) )
     end
   end

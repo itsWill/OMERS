@@ -1,9 +1,12 @@
 require_relative 'events_emitter'
+require 'byebug'
+require 'timeout'
 
 module OMERS
   class Stream
     include EventsEmitter
     CHUNK_SIZE = 4 * 1024
+    REQUEST_TIMEOUT = 30
 
     attr_reader :io
 
@@ -14,11 +17,19 @@ module OMERS
 
     def handle_read(bytes = CHUNK_SIZE)
       begin
-        data = io.read_nonblock(bytes)
-        emit(:data, data)
+        timeout(REQUEST_TIMEOUT) do
+          data = io.read_nonblock(bytes)
+          emit(:data, data)
+        end
+      rescue Timeout::Error
+        raise HTTPStatus::RequestTimeout
       rescue IO::WaitReadable
       rescue EOFError, Errno::ECONNRESET
         close if io.closed?
+      rescue => ex
+        STDERR.puts ex.message
+        STDERR.puts ex.backtrace
+        raise HTTPStatus::InternalServerError
       end
     end
 

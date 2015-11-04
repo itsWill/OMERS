@@ -16,7 +16,7 @@ module OMERS
 
     def listen(host, port)
       @socket = TCPServer.new(host, port)
-      server = OMERS::Server.new(@socket)
+      server = Server.new(@socket)
 
       register(server)
 

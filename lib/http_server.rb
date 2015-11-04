@@ -1,5 +1,7 @@
 require_relative './reactor'
+require_relative './http_request'
 
+require 'byebug'
 require 'uri'
 
 module OMERS

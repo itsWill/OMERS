@@ -1,5 +1,5 @@
 module OMERS
-  class Server < OMERS::Stream
+  class Server < Stream
     def handle_read
       begin
         client = io.accept_nonblock

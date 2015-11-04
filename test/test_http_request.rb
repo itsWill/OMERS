@@ -1,18 +1,14 @@
 require_relative '../lib/http_request'
 require_relative '../lib/http_status'
-
+require_relative '../lib/stream'
 require 'minitest/autorun'
 
 class TestHTTPRequest < MiniTest::Unit::TestCase
 
-  # Mock stream object
-  class Stream
-    def initialize(response)
-      @response = response
-    end
-
-    def handle_read(bytes)
-      @response
+  #mock IO object
+  class MockIO
+    def read_nonblock(bytes)
+      sleep(OMERS::Stream::REQUEST_TIMEOUT + 1)
     end
   end
 
@@ -22,7 +18,7 @@ class TestHTTPRequest < MiniTest::Unit::TestCase
   end
 
   def test_valid_get_request_is_successfully_parsed
-    @http_request.read_request_line(Stream.new(@get_request))
+    @http_request.read_request_line(@get_request)
     assert_equal "GET", @http_request.request[:method]
     assert_equal "/index.html", @http_request.request[:uri]
     assert_equal "1.1", @http_request.request[:http_version]
@@ -32,21 +28,28 @@ class TestHTTPRequest < MiniTest::Unit::TestCase
     large_request = "a" * OMERS::HTTPRequest::MAX_URI_LENGTH
 
     assert_raises(OMERS::HTTPStatus::RequestURITooLarge) do
-      @http_request.read_request_line( Stream.new(large_request) )
+      @http_request.read_request_line(large_request)
     end
   end
 
   def test_invalid_request_raises_exception
     bad_request = "GET / HTTP/bad.version\r\n"
     assert_raises(OMERS::HTTPStatus::BadRequest) do
-      @http_request.read_request_line( Stream.new(bad_request) )
+      @http_request.read_request_line(bad_request)
     end
   end
 
   def test_uri_path_is_sanitized_on_request
     unsafe_uri = "GET /../../../../../../../../etc/passwd HTTP/1.1\r\n"
     assert_raises(OMERS::HTTPStatus::BadRequest) do
-      @http_request.read_request_line( Stream.new(unsafe_uri) )
+      @http_request.read_request_line(unsafe_uri)
+    end
+  end
+
+  def test_long_request_raises_a_timeout_error
+    OMERS::Stream.const_set("REQUEST_TIMEOUT",0.1)
+    assert_raises(OMERS::HTTPStatus::RequestTimeout)do
+      OMERS::Stream.new(MockIO.new).handle_read
     end
   end
 end

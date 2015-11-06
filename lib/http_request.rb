@@ -1,9 +1,9 @@
 require 'timeout'
-require 'byebug'
 
 module OMERS
   class HTTPRequest
     LF = "\n"
+    CRLF = "\r\n"
 
     REQUEST_TIMEOUT = 30
     MAX_URI_LENGTH = 2083
@@ -15,20 +15,25 @@ module OMERS
         method: nil,
         uri: nil,
         http_version: nil,
-        headers: {}
+        headers: {},
+        body: nil
       }
     end
 
-    def read_request_line(message)
-      @request_line = message.lines.first
+    def parse_request(message)
+      split_request(message)
+      parse_request_line(@request_line)
+      parse_headers(@headers)
+    end
 
-      if @request_line.bytesize >= MAX_URI_LENGTH
+    def parse_request_line(request_line)
+      if request_line.bytesize >= MAX_URI_LENGTH
         raise HTTPStatus::RequestURITooLarge
       end
 
-       raise HTTPStatus::EOFError unless @request_line
+       raise HTTPStatus::EOFError unless request_line
 
-      if /^(\S+)\s+(\S+)(?:\s+HTTP\/(\d+\.\d+))?\r?\n/ =~ @request_line
+      if /^(\S+)\s+(\S+)(?:\s+HTTP\/(\d+\.\d+))?\r?\n/ =~ request_line
         request[:method] = $1
         request[:uri] = normalize_path($2) unless $2.nil?
         request[:http_version] = $3
@@ -37,10 +42,44 @@ module OMERS
       end
     end
 
-    def read_headers
+    # based on: https://github.com/nahi/webrick/blob/master/lib/webrick/httputils.rb#L162-L190
+    def parse_headers(headers)
+      field = nil
+
+      @headers.each do |header|
+        case header
+        when /^([A-Za-z0-9!\#$%&'*+\-.^_`|~]+):\s*(.*?)\s*\z/om
+          field, value = $1, $2
+          field.downcase
+          request[:headers][field] = [] unless request[:headers].has_key?(field)
+          request[:headers][field] << value
+        when /^\s+(.*?)\s\z/om
+          value = $1
+          raise HTTPStatus::BadRequest, "bad header #{header}" if field.nil?
+          request[:headers][field].last << " " << value
+        else
+          raise HTTPStatus::BadRequest, "bad header #{header}"
+        end
+      end
+
+      request[:headers].each do |key, values|
+        values.each do |value|
+          value.strip!
+          value.gsub!(/\s+/," ")
+        end
+
+        request[:headers][key] = values.first if values.size == 1
+      end
     end
 
     private
+
+    def split_request(message)
+       message = message.split("\n\n")
+       @request_line = message[0].lines.first
+       @headers = message[0].lines[1...message[0].size]
+       request[:body] = message[1]
+    end
 
     # taken from: https://github.com/nahi/webrick/blob/master/lib/webrick/httputils.rb#L62-L72
     def normalize_path(path)

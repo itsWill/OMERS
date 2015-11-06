@@ -18,7 +18,7 @@ class TestHTTPRequest < MiniTest::Unit::TestCase
   end
 
   def test_valid_get_request_is_successfully_parsed
-    @http_request.read_request_line(@get_request)
+    @http_request.parse_request_line(@get_request)
     assert_equal "GET", @http_request.request[:method]
     assert_equal "/index.html", @http_request.request[:uri]
     assert_equal "1.1", @http_request.request[:http_version]
@@ -28,21 +28,21 @@ class TestHTTPRequest < MiniTest::Unit::TestCase
     large_request = "a" * OMERS::HTTPRequest::MAX_URI_LENGTH
 
     assert_raises(OMERS::HTTPStatus::RequestURITooLarge) do
-      @http_request.read_request_line(large_request)
+      @http_request.parse_request_line(large_request)
     end
   end
 
   def test_invalid_request_raises_exception
     bad_request = "GET / HTTP/bad.version\r\n"
     assert_raises(OMERS::HTTPStatus::BadRequest) do
-      @http_request.read_request_line(bad_request)
+      @http_request.parse_request_line(bad_request)
     end
   end
 
   def test_uri_path_is_sanitized_on_request
     unsafe_uri = "GET /../../../../../../../../etc/passwd HTTP/1.1\r\n"
     assert_raises(OMERS::HTTPStatus::BadRequest) do
-      @http_request.read_request_line(unsafe_uri)
+      @http_request.parse_request_line(unsafe_uri)
     end
   end
 
@@ -51,5 +51,36 @@ class TestHTTPRequest < MiniTest::Unit::TestCase
     assert_raises(OMERS::HTTPStatus::RequestTimeout)do
       OMERS::Stream.new(MockIO.new).handle_read
     end
+  end
+
+  def test_headers_are_correctly_parsed
+    msg = <<-_end_of_message_
+      GET /path HTTP/1.1
+      Host: test.ruby-lang.org:8080
+      Connection: close
+      Accept: text/*;q=0.3, text/html;q=0.7, text/html;level=1,
+              text/html;level=2;q=0.4, */*;q=0.5
+      Accept-Encoding: compress;q=0.5
+      Accept-Encoding: gzip;q=1.0, identity; q=0.4, *;q=0
+      Accept-Language: en;q=0.5, *; q=0
+      Accept-Language: ja
+      Content-Type: text/plain
+      Content-Length: 7
+      X-Empty-Header:
+
+      foobar
+    _end_of_message_
+    @http_request.parse_request(msg.gsub(/^ {6}/,""))
+    result = {
+      "Host"=>"test.ruby-lang.org:8080",
+      "Connection"=>"close",
+      "Accept"=>"text/*;q=0.3, text/html;q=0.7, text/html;level=1," +
+                " text/html;level=2;q=0.4, */*;q=0.5",
+      "Accept-Encoding"=>["compress;q=0.5", "gzip;q=1.0, identity; q=0.4, *;q=0"],
+      "Accept-Language"=>["en;q=0.5, *; q=0", "ja"], "Content-Type"=>"text/plain",
+      "Content-Length"=>"7",
+      "X-Empty-Header"=>""
+    }
+    assert_equal @http_request.request[:headers], result
   end
 end

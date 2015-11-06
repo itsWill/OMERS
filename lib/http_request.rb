@@ -1,5 +1,7 @@
 require 'timeout'
 
+require_relative 'http_status'
+
 module OMERS
   class HTTPRequest
     LF = "\n"

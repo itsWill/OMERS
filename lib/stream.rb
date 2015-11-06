@@ -27,9 +27,8 @@ module OMERS
       rescue EOFError, Errno::ECONNRESET
         close if io.closed?
       rescue => ex
-        STDERR.puts ex.message
-        STDERR.puts ex.backtrace
-        raise HTTPStatus::InternalServerError
+        puts "#{ex.class}: #{ex.message}\n\t#{ex.backtrace[0]}"
+        emit(:error, ex)
       end
     end
 

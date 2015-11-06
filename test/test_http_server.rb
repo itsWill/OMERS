@@ -1,5 +1,7 @@
 require_relative '../lib/reactor'
 require_relative '../lib/http_server'
+require_relative '../lib/http_status'
+
 require 'minitest/autorun'
 
 class TestHTTPServer < MiniTest::Unit::TestCase
@@ -27,5 +29,9 @@ class TestHTTPServer < MiniTest::Unit::TestCase
 
   def test_server_returns_404_on_non_existant_file
     assert_equal @response_404, `echo GET /non_existant.html HTTP/1.1 | nc localhost 4481`
+  end
+
+  def test_server_returns_error_on_malformed_request
+    assert_equal "error", `echo GET / HTTP/GET | nc localhost 4481`
   end
 end

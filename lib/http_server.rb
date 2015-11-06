@@ -52,7 +52,9 @@ module OMERS
       listener.on(:accept) do |client|
         client.on(:data) do |data|
 
-          path = requested_file(data)
+          req = HTTPRequest.new()
+          req.parse_request(data)
+          path = File.join(WEB_ROOT,req.request[:uri])
 
           if File.exist?(path) && !File.directory?(path)
             File.open(path, "rb") do |file|
@@ -81,6 +83,10 @@ module OMERS
             client.write "\r\n"
           end
          client.close
+        end
+        client.on(:error) do |ex|
+          client.write "error"
+          client.close
         end
       end
     end

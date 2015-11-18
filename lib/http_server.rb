@@ -54,7 +54,7 @@ module OMERS
 
           req = HTTPRequest.new()
           req.parse_request(data)
-          path = File.join(WEB_ROOT,req.request[:uri])
+          path = File.join(WEB_ROOT,req.params[:path])
 
           if File.exist?(path) && !File.directory?(path)
             File.open(path, "rb") do |file|

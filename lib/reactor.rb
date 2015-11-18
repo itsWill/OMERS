@@ -37,7 +37,6 @@ module OMERS
     end
 
     def start
-      @running = true
       loop {tick}
     end
 
@@ -55,7 +54,6 @@ module OMERS
     end
 
     def shutdown
-      @running = false
       @streams.each do |s|
         s.close
       end

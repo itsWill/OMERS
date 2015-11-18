@@ -19,9 +19,9 @@ class TestHTTPRequest < MiniTest::Test
 
   def test_valid_get_request_is_successfully_parsed
     @http_request.parse_request_line(@get_request)
-    assert_equal "GET", @http_request.request[:method]
-    assert_equal "/index.html", @http_request.request[:uri]
-    assert_equal "1.1", @http_request.request[:http_version]
+    assert_equal "GET", @http_request.params[:method]
+    assert_equal "/index.html", @http_request.params[:uri]
+    assert_equal "1.1", @http_request.params[:http_version]
   end
 
   def test_request_larger_than_MAX_URI_LENGTH_raises_exception
@@ -81,6 +81,6 @@ class TestHTTPRequest < MiniTest::Test
       "Content-Length"=>"7",
       "X-Empty-Header"=>""
     }
-    assert_equal @http_request.request[:headers], result
+    assert_equal @http_request.params[:headers], result
   end
 end

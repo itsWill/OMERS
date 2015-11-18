@@ -4,10 +4,7 @@ require_relative '../lib/http_status'
 
 require 'minitest/autorun'
 
-class TestHTTPServer < MiniTest::Unit::TestCase
-  # start server running in a background thread
-  Thread.new { OMERS::HTTPServer.new.run }
-
+class TestHTTPServer < MiniTest::Test
   def setup
     @response_200 = "HTTP/1.1 200OK\r\n" +
                     "Content-Type: text/html\r\n" +
@@ -21,6 +18,14 @@ class TestHTTPServer < MiniTest::Unit::TestCase
                     "Content-Length: 16\r\n" +
                     "Connection: close \r\n" +
                     "\r\n"
+
+    # start a server running in the background
+    @server = OMERS::HTTPServer.new
+    Thread.new{ @server.run }
+  end
+
+  def teardown
+    @server.shutdown
   end
 
   def test_server_gets_file_correctly

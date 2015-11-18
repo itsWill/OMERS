@@ -4,15 +4,15 @@ module OMERS
 
     class Status < StandardError
       class << self
-        attr_reader :code, :description
+        attr_reader :code, :reason_phrase
       end
 
       def code
         self::class::code
       end
 
-      def description
-        self::class:description
+      def reason_phrase
+        self::class:reason_phrase
       end
 
       alias to_i code
@@ -85,12 +85,12 @@ module OMERS
 
       status_class = Class.new(parent)
       status_class.instance_variable_set(:@code, code)
-      status_class.instance_variable_set(:@description, message)
+      status_class.instance_variable_set(:@reason_phrase, message)
       self.const_set(status_class_name, status_class)
       CodeToStatus[:code] = status_class
     end
 
-    def description(code)
+    def reason_phrase(code)
       StatusMessage[code.to_i]
     end
 

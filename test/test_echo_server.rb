@@ -1,7 +1,7 @@
 require_relative '../lib/reactor'
 require 'minitest/autorun'
 
-class TestEchoServer < MiniTest::Unit::TestCase
+class TestEchoServer < MiniTest::Test
   def test_simple_echo_server_works
     reactor = OMERS::Reactor.new
     server = reactor.listen '0.0.0.0', 4481
@@ -18,6 +18,7 @@ class TestEchoServer < MiniTest::Unit::TestCase
       reactor.start
     end
 
-    assert_equal `echo foo | nc localhost 4481`.strip, "foo"
+    assert_equal "foo", `echo foo | nc localhost 4481`.strip
+    reactor.shutdown
   end
 end

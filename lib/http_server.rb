@@ -95,5 +95,9 @@ module OMERS
       setup
       reactor.start
     end
+
+    def shutdown
+      reactor.shutdown
+    end
   end
 end

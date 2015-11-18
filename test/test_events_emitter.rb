@@ -1,7 +1,7 @@
 require_relative '../lib/events_emitter'
 require 'minitest/autorun'
 
-class TestEventsEmitter < MiniTest::Unit::TestCase
+class TestEventsEmitter < MiniTest::Test
   include EventsEmitter
 
   def test_on_and_emit

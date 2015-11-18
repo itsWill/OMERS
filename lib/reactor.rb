@@ -4,6 +4,7 @@ require_relative 'events_emitter'
 require_relative './stream'
 require_relative './server'
 
+
 module OMERS
   class Reactor
     include EventsEmitter
@@ -36,14 +37,28 @@ module OMERS
     end
 
     def start
+      @running = true
       loop {tick}
     end
 
     def tick
-      readable, writable, _ = IO.select(streams, streams)
+      begin
+        readable, writable, _ = IO.select(streams, streams)
 
-      readable.each { |stream| stream.handle_read  }
-      writable.each { |stream| stream.handle_write }
+        readable.each { |stream| stream.handle_read  }
+        writable.each { |stream| stream.handle_write }
+      rescue Errno::EBADF
+        # when the server is close on shutdown select will raise Errno::EBADF
+      rescue => ex
+        raise ex
+      end
+    end
+
+    def shutdown
+      @running = false
+      @streams.each do |s|
+        s.close
+      end
     end
   end
 end

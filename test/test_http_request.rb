@@ -3,7 +3,7 @@ require_relative '../lib/http_status'
 require_relative '../lib/stream'
 require 'minitest/autorun'
 
-class TestHTTPRequest < MiniTest::Unit::TestCase
+class TestHTTPRequest < MiniTest::Test
 
   #mock IO object
   class MockIO

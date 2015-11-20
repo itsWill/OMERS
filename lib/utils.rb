@@ -1,9 +1,12 @@
 module OMERS
   CRLF = "\r\n"
   LF = "\n"
-  WEBROOT = "./public"
+  WEB_ROOT = "./public"
+  CHUNK_SIZE = 4 * 1024
+  REQUEST_TIMEOUT = 30
+  HTTP_VERSION = "1.1"
 
-  class Utils
+  module Utils
     MimeTypes = {
       "ai"    => "application/postscript",
       "asc"   => "text/plain",
@@ -62,7 +65,7 @@ module OMERS
     }
 
     # taken from:https://github.com/evan/mongrel/blob/master/lib/mongrel/handlers.rb#L230-L235
-    def mime_type(filename, mime_table)
+    def mime_type(filename)
       dot_pos = filename.rindex('.')
       if dot_pos
         MimeTypes[filename[dot_pos .. -1]] || "application/octet-stream"
@@ -70,6 +73,7 @@ module OMERS
         "application/octet-stream"
       end
     end
+    module_function :mime_type
 
     def self.unescape(s)
       s.tr('+', ' ').gsub(/((?:%[0-9a-fA-F]{2})+)/n){

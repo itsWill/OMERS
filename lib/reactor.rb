@@ -1,8 +1,8 @@
 require 'socket'
 
 require_relative 'events_emitter'
-require_relative './stream'
-require_relative './server'
+require_relative 'stream'
+require_relative 'server'
 
 
 module OMERS

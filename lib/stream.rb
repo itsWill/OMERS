@@ -1,12 +1,11 @@
-require_relative 'events_emitter'
-require 'byebug'
 require 'timeout'
+
+require_relative 'utils'
+require_relative 'events_emitter'
 
 module OMERS
   class Stream
     include EventsEmitter
-    CHUNK_SIZE = 4 * 1024
-    REQUEST_TIMEOUT = 30
 
     attr_reader :io
 

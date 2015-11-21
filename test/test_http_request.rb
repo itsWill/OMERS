@@ -1,14 +1,15 @@
 require_relative '../lib/http_request'
 require_relative '../lib/http_status'
 require_relative '../lib/stream'
-require 'minitest/autorun'
+require_relative '../lib/config'
 
+require 'minitest/autorun'
 class TestHTTPRequest < MiniTest::Test
 
   #mock IO object
   class MockIO
     def read_nonblock(bytes)
-      sleep(OMERS::Stream::REQUEST_TIMEOUT + 1)
+      sleep(OMERS::Config::DEFAULT[:RequestTimeout] + 1)
     end
   end
 
@@ -25,7 +26,7 @@ class TestHTTPRequest < MiniTest::Test
   end
 
   def test_request_larger_than_MAX_URI_LENGTH_raises_exception
-    large_request = "a" * OMERS::HTTPRequest::MAX_URI_LENGTH
+    large_request = "a" * OMERS::Config::DEFAULT[:MaxURILength]
 
     assert_raises(OMERS::HTTPStatus::RequestURITooLarge) do
       @http_request.parse_request_line(large_request)
@@ -47,7 +48,7 @@ class TestHTTPRequest < MiniTest::Test
   end
 
   def test_long_request_raises_a_timeout_error
-    OMERS::Stream.const_set("REQUEST_TIMEOUT",0.1)
+    OMERS::Config::DEFAULT[:RequestTimeout] = 0.1
     assert_raises(OMERS::HTTPStatus::RequestTimeout)do
       OMERS::Stream.new(MockIO.new).handle_read
     end

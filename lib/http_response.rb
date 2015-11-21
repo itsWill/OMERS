@@ -1,5 +1,6 @@
 require_relative 'utils'
-
+require_relative 'config'
+require 'byebug'
 require 'time'
 
 module OMERS
@@ -9,7 +10,7 @@ module OMERS
     def initialize()
       @params= {
         status: nil,
-        http_version: HTTP_VERSION,
+        http_version: Config::DEFAULT[:HttpVersion],
         reason_phrase: nil,
         headers: {},
         body: nil
@@ -48,10 +49,16 @@ module OMERS
     end
 
     def setup_body(resp)
-      if request_method == "HEAD"
+      if request_method == "HEAD" || params[:body] == nil
       else
         resp << params[:body]
       end
+    end
+
+    def set_error(err)
+      params[:status] = err.code
+      params[:reason_phrase] = HTTPStatus.reason_phrase(err.code)
+      params[:headers]["Content-Length"] = 0
     end
   end
 end

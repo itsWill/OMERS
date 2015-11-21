@@ -90,10 +90,9 @@ module OMERS
       CodeToStatus[:code] = status_class
     end
 
-    def reason_phrase(code)
+    def self.reason_phrase(code)
       StatusMessage[code.to_i]
     end
-    module_function :reason_phrase
 
     def self.[](code)
       CodeToStatus[code]

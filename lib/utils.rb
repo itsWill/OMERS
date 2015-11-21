@@ -1,11 +1,6 @@
 module OMERS
   CRLF = "\r\n"
   LF = "\n"
-  WEB_ROOT = "./public"
-  CHUNK_SIZE = 4 * 1024
-  REQUEST_TIMEOUT = 30
-  HTTP_VERSION = "1.1"
-
   module Utils
     MimeTypes = {
       "ai"    => "application/postscript",

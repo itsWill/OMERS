@@ -2,6 +2,7 @@ require 'timeout'
 
 require_relative 'utils'
 require_relative 'events_emitter'
+require_relative 'config'
 
 module OMERS
   class Stream
@@ -14,9 +15,9 @@ module OMERS
       @write_buffer = ""
     end
 
-    def handle_read(bytes = CHUNK_SIZE)
+    def handle_read(bytes = Config::DEFAULT[:ChunkSize])
       begin
-        timeout(REQUEST_TIMEOUT) do
+        timeout(Config::DEFAULT[:RequestTimeout]) do
           data = io.read_nonblock(bytes)
           emit(:data, data)
         end
@@ -25,9 +26,6 @@ module OMERS
       rescue IO::WaitReadable
       rescue EOFError, Errno::ECONNRESET
         close if io.closed?
-      rescue => ex
-        puts "#{ex.class}: #{ex.message}\n\t#{ex.backtrace[0]}"
-        emit(:error, ex)
       end
     end
 

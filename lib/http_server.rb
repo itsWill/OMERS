@@ -2,8 +2,8 @@ require_relative 'reactor'
 require_relative 'http_request'
 require_relative 'http_response'
 require_relative 'http_handler'
+require_relative 'config'
 
-require 'byebug'
 require 'uri'
 
 module OMERS
@@ -13,8 +13,9 @@ module OMERS
     attr_reader :listener, :reactor
 
     def initialize
-      @reactor = OMERS::Reactor.new
-      @listener = @reactor.listen '0.0.0.0', 4481
+      @reactor = Reactor.new
+      @config  = Config::DEFAULT
+      @listener = @reactor.listen 'localhost', @config[:Port]
     end
 
     def setup
@@ -26,24 +27,23 @@ module OMERS
 
             req.parse_request(data)
             res.request_method = req.params[:method]
-            HTTPHandler.service(req, res)
+            handler = @config[:Handler]
+            handler.service(req, res)
             res.send_response(client)
-          rescue Exception => ex
+          rescue HTTPStatus::Status => ex
+            res.set_error(ex)
+            res.send_response(client)
             puts "#{ex.message} #{ex.backtrace[0]}"
-            raise ex
           ensure
             client.close
           end
-        end
-        client.on(:error) do |ex|
-          client.write "error"
-          client.close
         end
       end
     end
 
     def run
       setup
+      puts "[OMERS] Server is listening on port: #{@config[:Port]}"
       reactor.start
     end
 

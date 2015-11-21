@@ -3,11 +3,10 @@ require 'uri'
 
 require_relative 'http_status'
 require_relative 'utils'
+require_relative 'config'
 
 module OMERS
   class HTTPRequest
-    REQUEST_TIMEOUT = 30
-    MAX_URI_LENGTH = 2083
 
     attr_accessor :params
 
@@ -29,7 +28,7 @@ module OMERS
     end
 
     def parse_request_line(request_line)
-      if request_line.bytesize >= MAX_URI_LENGTH
+      if request_line.bytesize >= Config::DEFAULT[:MaxURILength]
         raise HTTPStatus::RequestURITooLarge
       end
 

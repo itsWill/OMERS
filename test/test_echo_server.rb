@@ -1,5 +1,5 @@
 require_relative '../lib/reactor'
-require 'minitest/autorun'
+require 'test_helper'
 
 class TestEchoServer < MiniTest::Test
   def test_simple_echo_server_works

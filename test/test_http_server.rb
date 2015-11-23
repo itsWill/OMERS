@@ -3,13 +3,11 @@ require_relative '../lib/http_server'
 require_relative '../lib/http_status'
 
 
-require 'minitest/autorun'
-require 'minitest/reporters'
+require 'test_helper'
 require 'uri'
 require 'net/http'
 require 'byebug'
 
-MiniTest::Reporters.use!
 
 class TestHTTPServer < MiniTest::Test
   def setup

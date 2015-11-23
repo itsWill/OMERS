@@ -1,5 +1,5 @@
 require_relative '../lib/events_emitter'
-require 'minitest/autorun'
+require 'test_helper'
 
 class TestEventsEmitter < MiniTest::Test
   include EventsEmitter

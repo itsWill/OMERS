@@ -1,4 +1,4 @@
-require_relative 'http_handler'
+require 'http_handler'
 
 module OMERS
   module Config

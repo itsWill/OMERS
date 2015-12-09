@@ -1,6 +1,6 @@
-require_relative 'config'
-require_relative 'utils'
-require 'byebug'
+require 'config'
+require 'utils'
+
 #based onhttps://github.com/nahi/webrick/blob/master/lib/webrick/httpservlet/filehandler.rb
 module OMERS
   class HTTPHandler

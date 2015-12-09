@@ -1,6 +1,6 @@
-require_relative 'utils'
-require_relative 'config'
-require 'byebug'
+require 'utils'
+require 'config'
+
 require 'time'
 
 module OMERS

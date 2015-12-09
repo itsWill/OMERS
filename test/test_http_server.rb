@@ -6,8 +6,7 @@ require_relative '../lib/http_status'
 require 'test_helper'
 require 'uri'
 require 'net/http'
-require 'byebug'
-
+require 'socket'
 
 class TestHTTPServer < MiniTest::Test
   def setup
@@ -36,10 +35,12 @@ class TestHTTPServer < MiniTest::Test
   end
 
   def test_server_returns_error_on_malformed_request
-    response =  `echo GET / HTTP/GET | nc localhost 4481`
+    client = TCPSocket.new('localhost', 4481)
+    client.write "GET / HTTP/GET\r\n"
+    response = client.read
     status = response.lines[0]
     status = status.split
-    assert_equal status[1], "400"
+    assert_equal "400", status[1]
     assert_equal status[2] + " " + status[3], "Bad Request"
   end
 end

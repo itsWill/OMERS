@@ -1,8 +1,8 @@
 require 'timeout'
 
-require_relative 'utils'
-require_relative 'events_emitter'
-require_relative 'config'
+require 'utils'
+require 'events_emitter'
+require 'config'
 
 module OMERS
   class Stream

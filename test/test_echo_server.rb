@@ -1,5 +1,7 @@
 require_relative '../lib/reactor'
-require 'test_helper'
+
+require'test_helper'
+require 'socket'
 
 class TestEchoServer < MiniTest::Test
   def test_simple_echo_server_works
@@ -18,7 +20,11 @@ class TestEchoServer < MiniTest::Test
       reactor.start
     end
 
-    assert_equal "foo", `echo foo | nc localhost 4481`.strip
+
+    client = TCPSocket.new 'localhost', 4481
+    client.write "Hello"
+    response = client.read
+    assert_equal "Hello", response
     reactor.shutdown
   end
 end

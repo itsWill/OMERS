@@ -4,6 +4,7 @@ require_relative '../lib/stream'
 require_relative '../lib/config'
 
 require 'test_helper'
+
 class TestHTTPRequest < MiniTest::Test
 
   #mock IO object

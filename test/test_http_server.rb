@@ -19,6 +19,7 @@ class TestHTTPServer < MiniTest::Test
     response = Net::HTTP.get_response(@uri)
     assert_equal response.code, "200"
     assert_equal response.body, "<h1> Hello World </h1>"
+    assert_equal "text/html", response.content_type
   end
 
   def test_server_returns_404_on_non_existant_file

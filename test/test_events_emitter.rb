@@ -1,4 +1,3 @@
-require_relative '../lib/events_emitter'
 require 'test_helper'
 
 class TestEventsEmitter < MiniTest::Test

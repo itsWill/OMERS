@@ -1,8 +1,3 @@
-require_relative '../lib/reactor'
-require_relative '../lib/http_server'
-require_relative '../lib/http_status'
-
-
 require 'test_helper'
 require 'uri'
 require 'net/http'

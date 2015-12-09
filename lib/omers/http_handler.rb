@@ -1,5 +1,5 @@
-require 'config'
-require 'utils'
+require 'omers/config'
+require 'omers/utils'
 
 #based onhttps://github.com/nahi/webrick/blob/master/lib/webrick/httpservlet/filehandler.rb
 module OMERS

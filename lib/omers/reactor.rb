@@ -1,8 +1,8 @@
 require 'socket'
 
-require 'events_emitter'
-require 'stream'
-require 'server'
+require 'omers/events_emitter'
+require 'omers/stream'
+require 'omers/server'
 
 
 module OMERS

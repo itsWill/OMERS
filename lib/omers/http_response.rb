@@ -1,5 +1,5 @@
-require 'utils'
-require 'config'
+require 'omers/utils'
+require 'omers/config'
 
 require 'time'
 

@@ -1,9 +1,9 @@
 require 'timeout'
 require 'uri'
 
-require 'http_status'
-require 'utils'
-require 'config'
+require 'omers/http_status'
+require 'omers/utils'
+require 'omers/config'
 
 module OMERS
   class HTTPRequest

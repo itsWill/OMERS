@@ -1,4 +1,4 @@
-require 'http_handler'
+require 'omers/http_handler'
 
 module OMERS
   module Config

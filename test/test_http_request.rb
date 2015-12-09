@@ -1,8 +1,3 @@
-require_relative '../lib/http_request'
-require_relative '../lib/http_status'
-require_relative '../lib/stream'
-require_relative '../lib/config'
-
 require 'test_helper'
 
 class TestHTTPRequest < MiniTest::Test

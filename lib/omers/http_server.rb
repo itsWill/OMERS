@@ -1,8 +1,8 @@
-require 'reactor'
-require 'http_request'
-require 'http_response'
-require 'http_handler'
-require 'config'
+require 'omers/reactor'
+require 'omers/http_request'
+require 'omers/http_response'
+require 'omers/http_handler'
+require 'omers/config'
 
 require 'uri'
 

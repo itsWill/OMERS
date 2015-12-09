@@ -1,5 +1,3 @@
-require_relative '../lib/reactor'
-
 require'test_helper'
 require 'socket'
 

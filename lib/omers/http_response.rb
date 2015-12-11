@@ -49,10 +49,8 @@ module OMERS
     end
 
     def setup_body(resp)
-      if request_method == "HEAD" || params[:body] == nil
-      else
-        resp << params[:body]
-      end
+      return if request_method == "HEAD" || params[:body] == nil
+      resp << params[:body]
     end
 
     def set_error(err)

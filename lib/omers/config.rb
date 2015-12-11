@@ -12,5 +12,9 @@ module OMERS
       Port:             4481,
       MaxURILength:     2083
     }
+
+    RACK = DEFAULT.dup.update(
+      Handler: nil# RackHandler.new(app) user msut provide this
+    )
   end
 end

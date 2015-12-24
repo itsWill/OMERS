@@ -1,6 +1,5 @@
 require 'rack'
 require 'sinatra'
-require 'byebug'
 
 require 'omers'
 

@@ -1,6 +1,5 @@
 require 'omers/http_server'
 require 'omers/config'
-require 'byebug'
 
 module OMERS
   class RackHandler
@@ -17,13 +16,27 @@ module OMERS
       set_response(res, app)
     end
 
-
     def set_response(res,app)
       status, headers, body = app.call(env)
       res.status = status
       res.params[:headers] = headers
-      res.params[:body] = body.join
+      if body.is_a?(Rack::File)
+        res.params[:body] = read_file(body)
+      else
+        res.params[:body] = body.join
+      end
     end
+
+    def read_file(body)
+      begin
+        file = File.open(body.path)
+        file.read_nonblock(Config::DEFAULT[:ChunkSize])
+      rescue IO::WaitReadable
+      rescue EOFError
+        file.close
+      end
+    end
+
 
     def set_env(req)
       {

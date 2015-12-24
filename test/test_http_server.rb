@@ -15,11 +15,17 @@ class TestHTTPServer < MiniTest::Test
     @server.shutdown
   end
 
-  def test_server_gets_file_correctly
+  def test_server_gets_html_file_correctly
     response = Net::HTTP.get_response(@uri)
     assert_equal "200", response.code
     assert_equal "<h1> Hello World </h1>", response.body
     assert_equal "text/html", response.content_type
+  end
+
+  def test_server_gets_png_file_correctly
+    response = Net::HTTP.get_response(@uri+'/test_pic.png')
+    assert_equal "200", response.code
+    assert_equal "image/png", response.content_type
   end
 
   def test_server_returns_404_on_non_existant_file
@@ -27,6 +33,13 @@ class TestHTTPServer < MiniTest::Test
     response = Net::HTTP.get_response(bad_uri)
     assert_equal "404", response.code
     assert_equal "Not Found ", response.message
+    assert_equal "", response.body
+  end
+
+  def test_server_returns_403_when_trying_to_access_a_directory
+    response = Net::HTTP.get_response(@uri + "/test_dir")
+    assert_equal "403", response.code
+    assert_equal "Forbidden ", response.message
     assert_equal "", response.body
   end
 

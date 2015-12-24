@@ -14,7 +14,7 @@ module OMERS
     }
 
     RACK = DEFAULT.dup.update(
-      Handler: nil# RackHandler.new(app) user msut provide this
+      Handler: nil# RackHandler.new(app) user must provide this
     )
   end
 end

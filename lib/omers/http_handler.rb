@@ -30,6 +30,7 @@ module OMERS
 
       res.params[:body] = read_file(file)
       res.status = 200;
+      file.close
     end
 
     def http_HEAD(req, res)

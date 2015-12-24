@@ -2,7 +2,7 @@ require 'test_helper'
 require 'uri'
 require 'net/http'
 require 'socket'
-require 'byebug'
+
 class TestHTTPServer < MiniTest::Test
   def setup
     # start a server running in the background

@@ -29,11 +29,10 @@ module OMERS
             res.request_method = req.params[:method]
             handler = @config[:Handler]
             handler.service(req, res)
-            res.send_response(client)
           rescue HTTPStatus::Status => ex
             res.set_error(ex)
-            res.send_response(client)
           ensure
+            res.send_response(client)
             client.close
           end
         end
